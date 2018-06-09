@@ -1,0 +1,65 @@
+<html>
+<head>
+    <title>5tNite</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background: #4682e2;
+            color: #eee;
+
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .wrap {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: flex-start;
+
+            padding-top: 10vh;
+        }
+
+        .title {
+            font-size: 32px;
+        }
+
+        canvas {
+            padding-top: 2vh;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.10/lodash.core.min.js"></script>
+
+    <script src="js/ws.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/render.js"></script>
+
+    <script>
+        function onload () {
+            let obj = initCanvas();
+
+            // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
+            addWsFn('state', board, function () {
+                console.log(this.size);
+            });
+
+            wsfns.state();
+        }
+    </script>
+</head>
+<body onload="onload();"><div class="wrap">
+    <p class="title">5tNite</p>
+    <canvas
+        id="canvas"
+        width="800"
+        height="450"
+    ></canvas>
+</div></body>
+</html>
