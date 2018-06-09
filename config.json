@@ -1,0 +1,4 @@
+{
+  "ServerAddress": "localhost:8100",
+  "StaticDir": "./client"
+}
