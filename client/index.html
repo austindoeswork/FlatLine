@@ -46,6 +46,8 @@
             initCanvas();
             render();
 
+            initWs();
+
             // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
             addWsFn('state', board, function () {
                 console.log(this.size);
