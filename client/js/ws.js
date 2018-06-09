@@ -1,27 +1,27 @@
 const URL = 'localhost';
-const PORT = '80';
+const PORT = '8100';
 
 function initWs () {
-    const ws = new WebSocket('ws://' + URL + ':' + PORT);
+    const ws = new WebSocket('ws://' + URL + ':' + PORT + '/echo');
 
     function wssend (ws, cmd) {
         ws.send(JSON.stringify(cmd));
     }
 
-    ws.on('open', () => {
+    ws.onopen =  () => {
         let cmd = {
             name: 'Init',
             body: null,
         }
 
         wssend(ws, cmd);
-    })
+    }
 
-    ws.on('message', (data) => {
+    ws.onmessage = (data) => {
         try {
             data = JSON.parse(data);
         } catch (e) {
-            console.error('Failed to parse response as JSON');
+            // console.error('Failed to parse response as JSON');
         }
 
         if (wsfns[data.type]) {
@@ -30,7 +30,7 @@ function initWs () {
             console.error('Unknown data type: ' + data.type);
         }
 
-    })
+    }
 
     return ws;
 }
