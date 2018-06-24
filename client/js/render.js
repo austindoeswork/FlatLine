@@ -20,7 +20,7 @@ function render () {
     canvasCtx.fillStyle = 'rgba(240, 240, 240, 1)';
 
     // NOTE: draw order is very important (obvi)
-    
+
     // 1. draw background
 
     // 2. draw tiles
