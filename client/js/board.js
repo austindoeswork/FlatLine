@@ -7,6 +7,8 @@ const config = {
             dirt: 3,
             grass: 3,
         },
+        width: 4,
+        height: 4,
     }
 };
 
@@ -25,11 +27,11 @@ function Tile (x, y, name, collision, visible=true) {
     this.sz = config['board'].tile_size;
 }
 
-Tile.prototype.Filename () {
+Tile.prototype.Filename = function () {
     let path = config['board'].graphics_path + '/tiles/';
     path += this.name;
 
-    let vars = config['board'].variations[]
+    let vars = config['board'].variations[this.name];
     if (vars) {
         path += Math.floor(Math.random()*vars);
     }
@@ -39,7 +41,7 @@ Tile.prototype.Filename () {
     return path;
 }
 
-Tile.prototype.Render (ctx) {
+Tile.prototype.Render = function (ctx) {
     if (!this.visible) {
         return false;
     }
@@ -58,14 +60,14 @@ function Board () {
     this.height = config['board'].height;
 }
 
-board.prototype.SetLegend (legend) {
+Board.prototype.SetLegend = function (legend) {
     for (let key in legend) {
         let data = legend[key];
 
         // just wait till u see how cool this is
-        board.prototype['__createTile' + key] = function (x, y) {
+        this['__createTile' + key] = function (x, y) {
             let t = new Tile(x, y, data.name, data.collision, data.visible);
-            this.tiles[x + y*this.width] = t;
+            this.__tiles[x + y*this.width] = t;
 
             // Any custom behavior for tile (in the future may be necessary)
             return t;
@@ -73,7 +75,7 @@ board.prototype.SetLegend (legend) {
     }
 }
 
-board.prototype.SetTiles (tiles) {
+Board.prototype.SetTiles = function (tiles) {
     for (let i = 0; i < tiles.length; i++) {
         let row = tiles[i];
 
@@ -84,18 +86,23 @@ board.prototype.SetTiles (tiles) {
     }
 }
 
-board.prototype.UpdateTiles () {
+Board.prototype.UpdateTiles = function () {
     // TODO: in the future we will be getting diffs instead of full states
     //       write a function here to handle that eventually
 }
 
-board.prototype.GetTileAt (x, y) {
+Board.prototype.GetTileAt = function (x, y) {
     return this.__tiles[x + y*this.width];
 }
 
-board.prototype.Render () {
+Board.prototype.Render = function (ctx) {
     // only loop through the area around the player
-    // then render each of those tiles
+    for (let i = 0; i < this.width; i++) {
+        for (let j = 0; j < this.height; j++) {
+            // then render each of those tiles
+            this.__tiles[j][i].Render(ctx);
+        }
+    }
 }
 
 var board = new Board();

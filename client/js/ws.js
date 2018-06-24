@@ -8,7 +8,7 @@ function initWs () {
         ws.send(JSON.stringify(cmd));
     }
 
-    ws.onopen =  () => {
+    ws.onopen = () => {
         let cmd = {
             type: 'Init',
             body: null,

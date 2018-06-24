@@ -31,6 +31,7 @@
         }
 
         canvas {
+            image-rendering: pixelated;
             padding-top: 2vh;
         }
     </style>
@@ -54,8 +55,6 @@
 
             // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
             addWsFn('State', board, function (body) {
-                console.log(this.size);
-
                 if (body.legend) {
                     this.SetLegend(body.legend)
                 }
@@ -64,7 +63,36 @@
                 this.SetTiles(body.tiles);
             });
 
-            wsfns.state();
+            wsfns.State({
+                legend: {
+                    '0': {
+                        name: 'air',
+                        collision: 'none',
+                        visible: false,
+                    },
+                    '1': {
+                        name: 'wall',
+                        collision: 'block',
+                    },
+                    '2': {
+                        name: 'dirt',
+                        collision: 'block',
+                    },
+                    // a bunch more
+                    'Z': {
+                        name: 'platform',
+                        collision: '1-way',
+                    }
+                },
+
+                tiles: [
+                    ['0', '0', '0', '0'],
+                    ['0', '1', '0', '0'],
+                    ['1', '2', '1', '1'],
+                    ['2', '2', '2', '2'],
+                ]
+            });
+
         }
     </script>
 </head>
