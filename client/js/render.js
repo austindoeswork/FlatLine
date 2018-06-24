@@ -19,6 +19,8 @@ function render () {
 
     canvasCtx.fillStyle = 'rgba(240, 240, 240, 1)';
 
+    // NOTE: draw order is very important (obvi)
+    
     // 1. draw background
 
     // 2. draw tiles
@@ -34,8 +36,4 @@ function render () {
     // 7. draw hud
 
     // 8. draw menus
-
-    drawBox(0,0, 16, 16);
-
-    drawBox(320, 132, 16, 32);
 }

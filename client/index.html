@@ -48,9 +48,20 @@
 
             initWs();
 
+            addWsFn('Init', null, function (body) {
+                console.log(body);
+            });
+
             // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
-            addWsFn('state', board, function () {
+            addWsFn('State', board, function (body) {
                 console.log(this.size);
+
+                if (body.legend) {
+                    this.SetLegend(body.legend)
+                }
+
+                // TODO: check if delta vs full state
+                this.SetTiles(body.tiles);
             });
 
             wsfns.state();
