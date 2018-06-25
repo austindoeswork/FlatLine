@@ -2,19 +2,20 @@
 const config = {
     board: {
         graphics_path: '/res/graphics/game/scene',
-        tile_size: 32, // pixels
+        tile_size: 16, // pixels
         variations: {
-            dirt: 3,
+            dirt: 8,
             grass: 3,
         },
-        width: 4,
-        height: 4,
+        width: 25,
+        height: 14,
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////            Tiles            /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
 
 function Tile (x, y, name, collision, visible=true) {
     this.name = name;
@@ -25,18 +26,17 @@ function Tile (x, y, name, collision, visible=true) {
     this.y = y;
 
     this.sz = config['board'].tile_size;
+
+
+    let vars = config['board'].variations[this.name];
+    this.var = Math.floor(Math.random()*vars);
 }
+
+Tile.seed = 0;
 
 Tile.prototype.Filename = function () {
     let path = config['board'].graphics_path + '/tiles/';
-    path += this.name;
-
-    let vars = config['board'].variations[this.name];
-    if (vars) {
-        path += Math.floor(Math.random()*vars);
-    }
-
-    path += '.png';
+    path += this.name + this.var + '.png';
 
     return path;
 }
@@ -47,6 +47,14 @@ Tile.prototype.Render = function (ctx) {
     }
 
     // TODO: render
+    drawTile(
+        this.Filename(),
+        this.x*this.sz,
+        this.y*this.sz,
+        this.sz,
+        this.sz
+    );
+
     return true;
 }
 
@@ -100,9 +108,7 @@ Board.prototype.Render = function (ctx) {
     for (let i = 0; i < this.width; i++) {
         for (let j = 0; j < this.height; j++) {
             // then render each of those tiles
-            this.__tiles[j][i].Render(ctx);
+            this.GetTileAt(i, j).Render(ctx);
         }
     }
 }
-
-var board = new Board();
