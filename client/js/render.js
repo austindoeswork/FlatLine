@@ -1,11 +1,29 @@
 var canvas;
 var canvasCtx;
 
+var __spriteMap = {}
+
+function loadSpriteSafe (path) {
+    if (__spriteMap[path]) {
+        return __spriteMap[path];
+    } else {
+        return loadSprite(path);
+    }
+}
+
+function loadSprite (path) {
+    let img = new Image();
+    img.src = path;
+    __spriteMap[path] = img;
+
+    return img;
+}
+
 function initCanvas () {
     canvas = document.getElementById('canvas');
     canvasCtx = canvas.getContext('2d');
 
-    canvasCtx.fillStyle = 'rgba(240, 240, 240, 1)';
+    canvasCtx.fillStyle = 'rgba(16, 16, 16, 1)';
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -14,28 +32,28 @@ function drawBox (x, y, wd, hg, color={r: 0, g: 0, b: 0, a: 1}) {
     canvasCtx.fillRect(x, canvas.height-y-hg, wd, hg);
 }
 
-function render () {
-    requestAnimationFrame(render);
+function drawTile (path, x, y, wd, hg) {
+    canvasCtx.drawImage(this.loadSpriteSafe(path), x, y, wd, hg);
+}
 
-    canvasCtx.fillStyle = 'rgba(240, 240, 240, 1)';
+function render (board) {
+    requestAnimationFrame(render.bind(this, board));
+
+    canvasCtx.fillStyle = 'rgba(16, 16, 16, 1)';
+
+    // NOTE: draw order is very important (obvi)
 
     // 1. draw background
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. draw tiles
+    // 2. draw board (tiles, then items, then players)
+    board.Render(canvasCtx);
 
-    // 3. draw items
+    // 3. draw effects
 
-    // 4. draw players
+    // 4. draw tooltips
 
-    // 5. draw effects
+    // 5. draw hud
 
-    // 6. draw tooltips
-
-    // 7. draw hud
-
-    // 8. draw menus
-
-    drawBox(0,0, 16, 16);
-
-    drawBox(320, 132, 16, 32);
+    // 6. draw menus
 }

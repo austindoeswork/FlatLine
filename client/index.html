@@ -31,29 +31,110 @@
         }
 
         canvas {
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
             padding-top: 2vh;
+
+            width: 800px;
+            height: 448px;
         }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.10/lodash.core.min.js"></script>
 
+    <script src="js/config.js"></script>
     <script src="js/ws.js"></script>
+    <script src="js/entity.js"></script>
     <script src="js/board.js"></script>
     <script src="js/render.js"></script>
 
     <script>
         function onload () {
-            initCanvas();
-            render();
+            var board = new Board();
 
             initWs();
 
-            // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
-            addWsFn('state', board, function () {
-                console.log(this.size);
+            addWsFn('Init', null, function (body) {
+                console.log(body);
             });
 
-            wsfns.state();
+            // Binding doesnt work with arrow functions ¯\_(ツ)_/¯
+            addWsFn('State', board, function (body) {
+                if (body.legend) {
+                    this.SetLegend(body.legend)
+                }
+
+                // TODO: check if delta vs full state
+                this.SetTiles(body.tiles);
+                this.SetEntities(body.entities);
+            });
+
+            wsfns.State({
+                legend: {
+                    '0': {
+                        name: 'air',
+                        collision: 'none',
+                        visible: false,
+                    },
+                    '1': {
+                        name: 'grass',
+                        collision: 'block',
+                    },
+                    '2': {
+                        name: 'dirt',
+                        collision: 'block',
+                    },
+                    // a bunch more
+                    'Z': {
+                        name: 'platform',
+                        collision: '1-way',
+                    },
+                },
+
+                tiles: [
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+                    ['0', '1', '0', '0', '0', '0', '0', '1', '1', '1', '1', '0', '0', '0', '0', '0', '1', '1', '1', '0', '0', '0', '0', '0', '0'],
+                    ['1', '2', '1', '1', '1', '1', '1', '2', '2', '2', '2', '1', '1', '0', '0', '1', '2', '2', '2', '1', '1', '0', '0', '0', '0'],
+                    ['2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '0', '0', '2', '2', '2', '2', '2', '2', '0', '0', '0', '1'],
+                    ['2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '0', '1', '2', '2', '2', '2', '2', '2', '0', '0', '1', '2'],
+                    ['2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '1', '2', '2', '2', '2', '2', '2', '2', '0', '0', '2', '2'],
+                    ['2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '1', '1', '2', '2'],
+                ],
+
+                entities: [{
+                    name: 'snubstone',
+                    y: 7,
+                    x: 9,
+                    wd: 16,
+                    hg: 16,
+                }, {
+                    name: 'cruba',
+                    type: 'player',
+                    y: 8,
+                    x: 5,
+                    wd: 24,
+                    hg: 24,
+                    collWd: 14,
+                    isMob: true,
+                }]
+            });
+
+            initCanvas();
+            render(board);
+
+            function update () {
+                board.Update();
+                window.setTimeout(update, 1000/60);
+            }
+
+            update();
         }
     </script>
 </head>
@@ -61,8 +142,8 @@
     <p class="title">5tNite</p>
     <canvas
         id="canvas"
-        width="800"
-        height="450"
+        width="400"
+        height="224"
     ></canvas>
 </div></body>
 </html>

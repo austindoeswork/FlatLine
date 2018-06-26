@@ -8,20 +8,20 @@ function initWs () {
         ws.send(JSON.stringify(cmd));
     }
 
-    ws.onopen =  () => {
+    ws.onopen = () => {
         let cmd = {
-            name: 'Init',
+            type: 'Init',
             body: null,
         }
 
         wssend(ws, cmd);
     }
 
-    ws.onmessage = (data) => {
-        try {
+    ws.onmessage = (event) => {
+        let data = event.data;
+
+        if (typeof data == 'string') {
             data = JSON.parse(data);
-        } catch (e) {
-            // console.error('Failed to parse response as JSON');
         }
 
         if (wsfns[data.type]) {
