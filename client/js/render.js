@@ -44,19 +44,16 @@ function render (board) {
     // NOTE: draw order is very important (obvi)
 
     // 1. draw background
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. draw tiles
+    // 2. draw board (tiles, then items, then players)
     board.Render(canvasCtx);
 
-    // 3. draw items
+    // 3. draw effects
 
-    // 4. draw players
+    // 4. draw tooltips
 
-    // 5. draw effects
+    // 5. draw hud
 
-    // 6. draw tooltips
-
-    // 7. draw hud
-
-    // 8. draw menus
+    // 6. draw menus
 }

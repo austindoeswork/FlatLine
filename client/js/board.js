@@ -1,21 +1,6 @@
-// TODO: move this to a config file
-const config = {
-    board: {
-        graphics_path: '/res/graphics/game/scene',
-        tile_size: 16, // pixels
-        variations: {
-            dirt: 8,
-            grass: 3,
-        },
-        width: 25,
-        height: 14,
-    }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////            Tiles            /////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-
 
 function Tile (x, y, name, collision, visible=true) {
     this.name = name;
@@ -25,9 +10,6 @@ function Tile (x, y, name, collision, visible=true) {
     this.x = x;
     this.y = y;
 
-    this.sz = config['board'].tile_size;
-
-
     let vars = config['board'].variations[this.name];
     this.var = Math.floor(Math.random()*vars);
 }
@@ -35,7 +17,7 @@ function Tile (x, y, name, collision, visible=true) {
 Tile.seed = 0;
 
 Tile.prototype.Filename = function () {
-    let path = config['board'].graphics_path + '/tiles/';
+    let path = config['board'].graphics_path + '/tile/';
     path += this.name + this.var + '.png';
 
     return path;
@@ -46,17 +28,17 @@ Tile.prototype.Render = function (ctx) {
         return false;
     }
 
-    // TODO: render
     drawTile(
         this.Filename(),
-        this.x*this.sz,
-        this.y*this.sz,
-        this.sz,
-        this.sz
+        this.x*config['board'].tile_size,
+        this.y*config['board'].tile_size,
+        config['board'].tile_size,
+        config['board'].tile_size
     );
 
     return true;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////            Board            /////////////////////////
@@ -66,6 +48,26 @@ function Board () {
     this.__tiles = [];
     this.width = config['board'].width;
     this.height = config['board'].height;
+
+    this.sz = config['board'].tile_size;
+
+    this.entities = [];
+    this.player = null;
+
+    this.keyState = {};
+}
+
+Board.prototype.SetPlayer = function (player) {
+    // Setup player pointer + movement controls
+    this.player = player;
+
+    window.addEventListener('keydown', (function (evt) {
+        this.keyState[evt.key] = true;
+    }).bind(this));
+
+    window.addEventListener('keyup', (function (evt) {
+        this.keyState[evt.key] = false;
+    }).bind(this));
 }
 
 Board.prototype.SetLegend = function (legend) {
@@ -99,6 +101,46 @@ Board.prototype.UpdateTiles = function () {
     //       write a function here to handle that eventually
 }
 
+Board.prototype.SetEntities = function (entities) {
+    for (let i = 0; i < entities.length; i++) {
+        let entity;
+        if (entities[i].isMob) {
+            entity = new Mob(
+                entities[i].x,
+                entities[i].y,
+                entities[i].wd,
+                entities[i].hg,
+                entities[i].collWd,
+                entities[i].collHg,
+                entities[i].name,
+                entities[i].type,
+            );
+
+            if (entities[i].type == 'player') {
+                this.SetPlayer(entity);
+            }
+        } else {
+            entity = new Entity(
+                entities[i].x,
+                entities[i].y,
+                entities[i].wd,
+                entities[i].hg,
+                entities[i].collWd,
+                entities[i].collHg,
+                entities[i].name,
+                entities[i].type,
+            );
+        }
+
+        this.entities.push(entity);
+    }
+}
+
+Board.prototype.UpdateEntities = function (entities) {
+    // TODO: in the future we will be getting diffs instead of full states
+    //       write a function here to handle that eventually
+}
+
 Board.prototype.GetTileAt = function (x, y) {
     return this.__tiles[x + y*this.width];
 }
@@ -110,5 +152,32 @@ Board.prototype.Render = function (ctx) {
             // then render each of those tiles
             this.GetTileAt(i, j).Render(ctx);
         }
+    }
+
+    for (let i = 0; i < this.entities.length; i++) {
+        this.entities[i].Render();
+    }
+}
+
+Board.prototype.Update = function () {
+    // Read input
+    if (this.keyState['a']) {
+        this.player.Move(-1);
+    } else if (this.keyState['d']) {
+        this.player.Move(1);
+    } else {
+        this.player.Move(0);
+    }
+
+    if (this.keyState['Shift']) {
+        this.keyState['Shift'] = false;
+        this.player.Jump();
+    }
+
+    // Run game logic on tiles
+
+    // Run game logic on entities
+    for (let i = 0; i < this.entities.length; i++) {
+        this.entities[i].Update(this);
     }
 }
